@@ -4,14 +4,14 @@
  * Automatically sends "continue" when the agent becomes idle.
  *
  * Configuration:
- * - MAX_CONTINUES: Maximum number of auto-continues per session (0 = unlimited)
+ * - MAX_CONTINUES: -1 = disabled, 0 = unlimited, >0 = limit per session
  * - CONTINUE_MESSAGE: The message to send when continuing
  * - COOLDOWN_MS: Minimum time between continues to prevent rapid loops
  */
 
 import type { Plugin } from "@opencode-ai/plugin"
 
-const MAX_CONTINUES = -1 
+const MAX_CONTINUES = 0 
 const CONTINUE_MESSAGE = "continue"
 const COOLDOWN_MS = 1000
 
@@ -35,11 +35,26 @@ function isCooldownActive(state: SessionState): boolean {
   return Date.now() - state.lastContinueTimestamp < COOLDOWN_MS
 }
 
+function isPluginDisabled(): boolean {
+  return MAX_CONTINUES < 0
+}
+
 function hasReachedMaxContinues(state: SessionState): boolean {
   return MAX_CONTINUES > 0 && state.continueCount >= MAX_CONTINUES
 }
 
 export const AutoContinuePlugin: Plugin = async ({ client }) => {
+  if (isPluginDisabled()) {
+    await client.app.log({
+      body: {
+        service: "auto-continue",
+        level: "info",
+        message: "Plugin disabled (MAX_CONTINUES = -1)",
+      },
+    })
+    return {}
+  }
+
   await client.app.log({
     body: {
       service: "auto-continue",

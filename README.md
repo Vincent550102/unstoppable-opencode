@@ -34,14 +34,14 @@ curl -o ~/.config/opencode/plugins/auto-continue.ts \
 Edit the constants at the top of `auto-continue.ts`:
 
 ```typescript
-const MAX_CONTINUES = 0        // 0 = unlimited, or set a limit (e.g., 5)
+const MAX_CONTINUES = 0        // -1 = disabled, 0 = unlimited, >0 = limit
 const CONTINUE_MESSAGE = "continue"
 const COOLDOWN_MS = 1000       // Minimum ms between continues
 ```
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `MAX_CONTINUES` | `0` | Maximum auto-continues per session. Set to `0` for unlimited. |
+| `MAX_CONTINUES` | `0` | `-1` = disabled, `0` = unlimited, `>0` = limit per session |
 | `CONTINUE_MESSAGE` | `"continue"` | Message sent to the agent |
 | `COOLDOWN_MS` | `1000` | Cooldown between continues (prevents rapid loops) |
 
@@ -54,6 +54,7 @@ const COOLDOWN_MS = 1000       // Minimum ms between continues
 
 ## Safety Features
 
+- **Disable option**: Set `MAX_CONTINUES = -1` to disable the plugin
 - **Cooldown**: 1 second minimum between continues
 - **Per-session tracking**: Each session has independent state
 - **Optional limit**: Set `MAX_CONTINUES` to prevent infinite loops
